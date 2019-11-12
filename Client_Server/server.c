@@ -36,9 +36,9 @@ void send_recv(int i, fd_set *master, int sockfd, int fdmax)
 		close(i);
 		FD_CLR(i, master);
 	}else {
-	//	printf("%s\n", recv_buf);
+		printf("Recv : %s\n", recv_buf);
 		for(j = 0; j <= fdmax; j++){
-      printf("Recv : %s\n", recv_buf);
+      // printf("Recv : %s\n", recv_buf);
 			send_to_all(j, i, sockfd, nbytes_recvd, recv_buf, master );
 		}
 	}

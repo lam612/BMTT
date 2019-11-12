@@ -12,7 +12,7 @@
 
 #define BUFSIZE 102
 
-double n = 80460899, e = 37, d, p, q, fi;
+long double n = 6411845467, e = 37, d = 5198663773, p, q, fi;
 
 void send_recv(int i, int sockfd)
 {
@@ -64,7 +64,7 @@ int main()
 	fd_set master;
 	fd_set read_fds;
 
-  getInput(n, e, &p, &q, &fi, &d);
+  // getInput(n, e, &p, &q, &fi, &d);
 
 	connect_request(&sockfd, &server_addr);
 	FD_ZERO(&master);
