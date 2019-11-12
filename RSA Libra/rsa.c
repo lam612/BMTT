@@ -5,11 +5,11 @@
 #include <ctype.h>
 #include "rsa.h"
 
-int check_point = 1;
+int check_point = 0;
 
-int isPrimeNumber(double num) {
+int isPrimeNumber(long double num) {
   for(int i = 2; i <= sqrt(num); i++){
-    if(fmod(num, i) == 0){
+    if(fmodl(num, i) == 0){
       return 0;
     }
   }
@@ -17,13 +17,13 @@ int isPrimeNumber(double num) {
   return 1;
 }
 
-void analysisToTwoPrime(double num, double *num1, double *num2) {
+void analysisToTwoPrime(long double num, long double *num1, long double *num2) {
   *num1 = 1;
   *num2 = num;
 
   for(int i = 2; i <= sqrt(num); i++) {
     if(isPrimeNumber(i)) {
-      if(fmod(num, i) == 0) {
+      if(fmodl(num, i) == 0) {
         if(isPrimeNumber(num / i)) {
           *num1 = i;
           *num2 = num / i;
@@ -35,22 +35,22 @@ void analysisToTwoPrime(double num, double *num1, double *num2) {
 }
 
 // Get Primary Key
-void euclid(double n, double e, double *d) {
+void euclid(long double n, long double e, long double *d) {
   *d = 1;
-  for(int i = 0; i < MAXNUMBER; i++) {
-    if(fmod(i*e - 1, n) == 0) {
+  for(long double i = 0; i < MAXNUMBER; i++) {
+    if(fmodl(i*e - 1, n) == 0) {
       *d = i;
       return;
     }
   }
 }
 
-double gcd(double a, double b) {
+long double gcd(long double a, long double b) {
   if (b == 0) return a;
-  return gcd(b, fmod(a, b));
+  return gcd(b, fmodl(a, b));
 }
 
-void getInput(double n, double e, double* p, double* q, double* fi, double* d) {
+void getInput(long double n, long double e, long double* p, long double* q, long double* fi, long double* d) {
   analysisToTwoPrime(n, p, q);
   if(*p != 1) {
     // Get fi(n)
@@ -65,26 +65,28 @@ void getInput(double n, double e, double* p, double* q, double* fi, double* d) {
 }
 
 // x ^ y mod n
-char* crypto(char *monoPt, double y, double n) {
-  double x = stringToDb(monoPt);
-  if(check_point) printf("%s to %.1lf\n", monoPt, x);
+char* crypto(char *monoPt, long double y, long double n) {
+  long double x = stringToDb(monoPt);
+  if(check_point) printf("%s to %.1Lf\n", monoPt, x);
 
   if(x > n) {
-    printf("%.1lf is too small !!!\n\n", n);
+    printf("%.1Lf is too small !!!\n\n", n);
     return NISTOOSMALLERRORMES;
   }
 
   // Decimal to binary
   int loops = decToBinary(y);
-  double result = 1;
+  long double result = 1;
   for(int i = 0; i < loops; i++) {
-    if(check_point) printf("Loops %d(%d) : %.1lf^2 => ", i, binaryNum[i], result);
-    result = fmod((result * result), n);
-    if(check_point) printf("%.0lf", result);
+    if(check_point) printf("Loops %d(%d) : %.1Lf^2 => ", i, binaryNum[i], result);
+    result = fmodl((result * result), n);
+    if(result > n / 2) result = n - result;
+    if(check_point) printf("%.1Lf", result);
     if(binaryNum[i] == 1) {
-      if(check_point) printf(" || %.1lf", result);
-      result = fmod((result * x), n);
-      if(check_point) printf(" * %.1lf => %.1lf", x, result);
+      if(check_point) printf(" || %.1Lf", result);
+      result = fmodl((result * x), n);
+      if(result > n / 2) result = n - result;
+      if(check_point) printf(" * %.1Lf => %.1Lf", x, result);
     }
     if(check_point) printf("\n");
 
@@ -95,21 +97,21 @@ char* crypto(char *monoPt, double y, double n) {
   char* tmp = (char *)malloc(12 * sizeof(char));
 
   tmp = decToAlpha(result);
-  if(check_point) printf("Cryp result : %s - %.1lf\n", tmp, result);
+  if(check_point) printf("Cryp result : %s - %.1Lf\n", tmp, result);
 
   return tmp;
 }
 
-int decToBinary(double num) {
+int decToBinary(long double num) {
   int tmpBinary[MAXBINARY];
 
   int n = 0, tmp;
 
-  if(check_point) printf("Dec : %.1lf to Binary : ", num);
+  if(check_point) printf("Dec : %.1Lf to Binary : ", num);
 
   while(num > 0) {
-    tmp = (int)fmod(num, 2);
-    tmpBinary[n] = fmod(num, 2);
+    tmp = (int)fmodl(num, 2);
+    tmpBinary[n] = fmodl(num, 2);
     num = (num - tmp) / 2;
     n++;
   }
@@ -130,19 +132,19 @@ int decToBinary(double num) {
   }
   return n;
 }
-char* decToAlpha(double num) {
+char* decToAlpha(long double num) {
   int tmpAlpha[MAXBINARY];
 
   if(num == 0) {
     return "a";
   }
 
-  if(check_point) printf("Dec to Alpha : %.1lf\n", num);
+  if(check_point) printf("Dec to Alpha : %.1Lf\n", num);
 
   int n = 0;
-  double bina;
+  long double bina;
   while(num > 0) {
-    bina = fmod(num, 27);
+    bina = fmodl(num, 27);
     tmpAlpha[n] = (int)bina;
     num = (num - bina) / 27;
     n++;
@@ -161,18 +163,18 @@ char* decToAlpha(double num) {
   return tmp;
 }
 
-double stringToDb(char *input) {
-  double result = 0;
+long double stringToDb(char *input) {
+  long double result = 0;
   for(int i = 0; i < strlen(input); i++) {
     result += (tolower(input[i]) - 96) * pow(27, strlen(input) - i - 1);
     if(check_point) printf("i : %d - char : %c - %d\n", i, input[i], input[i] - 96);
   }
-  if(check_point) printf("Result : %.1lf\n", result);
+  if(check_point) printf("Result : %.1Lf\n", result);
 
   return result;
 }
 
-char* crypPlainText(char *pt, double y, double n) {
+char* crypPlainText(char *pt, long double y, long double n) {
   const char delim[] = " ";
   char *tmp, *tmpPtList;
   char* result = (char *)malloc(MAXLEIGHT * sizeof(char));
